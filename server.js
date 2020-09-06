@@ -23,8 +23,16 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express.Router();
 const a = express();
+const helmet = require("helmet");
 a.use(bodyParser.urlencoded({ extended: false }));
 a.use(bodyParser.json());
+a.use(helmet.contentSecurityPolicy({
+	directives: {
+		defaultSrc: ["'self'"],
+		"img-src": ["'self'", 'img.shields.io', 'forthebadge.com', 'top.gg', 'topcord.xyz'],
+		"frame-src": ["'self'", 'topcord.xyz']
+	}}));
+
 a.use("/", app);
 
 
