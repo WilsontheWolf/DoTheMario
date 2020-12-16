@@ -38,7 +38,7 @@ a.use(helmet.contentSecurityPolicy({
 a.use('/', app);
 
 
-const type = 'rick';
+const type = 'mario';
 let serversBadge = '{"schemaVersion": 1,"label": "invite","message": "Loading server count","color": "red"}';
 let publicCount = `{"schemaVersion": 1,"label": "loading","message": "${type} count","color": "red"}`;
 
