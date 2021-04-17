@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node index.js"
   },
+  "author": "WilsontheWolf",
+  "license": "MIT",
+  "private:": true,
   "dependencies": {
     "@discordjs/opus": "0.5",
     "@joshdb/core": "^1.2.1",
