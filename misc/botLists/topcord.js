@@ -6,7 +6,7 @@ const topcord = async (client, token = process.env.TOPCORD) => {
         shards: client.shards.size
     };
     try {
-        const json = await fetch(`https://api.topcord.xyz/bot/${client.user.id}/stats/`, {
+        const json = await fetch(`https://api.topcord.xyz/bot/${client.user.id}/stats`, {
             method: 'post',
             body: JSON.stringify(data),
             headers: {
@@ -15,7 +15,7 @@ const topcord = async (client, token = process.env.TOPCORD) => {
             }
         })
             .then(res => res.json());
-        if (json.message == 'Bot Updated') return;
+        if (json.message == 'Bot updated!') return;
         console.error('Received unexpected response sending topcord data!');
         console.error(json);
     } catch (e) {
