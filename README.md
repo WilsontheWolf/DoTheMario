@@ -10,14 +10,13 @@
 [![forthebadge](https://forthebadge.com/images/badges/you-didnt-ask-for-this.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/mom-made-pizza-rolls.svg)](https://forthebadge.com)
 
-A simple Discord bot used to play a single song on a voice channel.  
-Made to play the "Do The Mario" song but current version allows a lot of customization ranging from the song to the stuff displayed on the web.
+A simple Discord bot to play a single song on a voice channel.  
+Made to play the "Do The Mario" song but current version allows a lot of customizations ranging from the song to the stuff displayed on the webpage.
 
-Rewritten to use Eris and Koa instead of the usually Discord.JS and express.
+Rewritten to use Eris and Koa instead of the usual Discord.JS and Express combination.
 
 [Official bot webpage](https://dtm.antti.codes/)  
 [Official rick roll alternative](https://rick.antti.codes/)
-
 
 [![do the mario](https://top.gg/api/widget/607273553573838860.svg)](https://top.gg/bot/607273553573838860)
 [![rick astley](https://top.gg/api/widget/640024867185623041.svg)](https://top.gg/bot/640024867185623041)
