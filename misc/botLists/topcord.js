@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 const topcord = async (client, token = process.env.TOPCORD) => {
     const data = {
-        guilds: client.guilds.cache.size,
+        guilds: client.guilds.size,
         shards: client.shards.size
     };
     try {

@@ -101,20 +101,22 @@ You can do so [here](https://discord.com/oauth2/authorize?client_id=${client.use
 });
 
 client.on('guildCreate', () => {
-    client.guilds.get(client.config.loggingGuild)
-        .get(client.config.loggingChannel)
-        .send(`Joined a new server! Now I have ${client.guilds.cache.size} servers!`)
+    client.getChannel(client.config.loggingChannel)
+        .send(`Joined a new server! Now I have ${client.guilds.size} servers!`)
         .catch(e => console.error('error logging', e));
 });
 
 client.on('guildDelete', () => {
-    client.guilds.get(client.config.loggingGuild)
-        .get(client.config.loggingChannel)
-        .send(`Left a server! Now I have ${client.guilds.cache.size} servers!`)
+    client.getChannel(client.config.loggingChannel)
+        .send(`Left a server! Now I have ${client.guilds.size} servers!`)
         .catch(e => console.error('error logging', e));
 });
 
-client.connect();
+client.connect().catch(e => {
+    console.error('Error logging into client');
+    console.error(e);
+    process.exit(1);
+});
 
 (async () => {
     {

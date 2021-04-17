@@ -31,11 +31,8 @@ module.exports = (client) => {
     };
     client.play = async (channel) => {
         try {
-            if (!channel || !channel.guild || !client.canJoinVC(channel) || !client.canSpeakVC(channel) || client.voiceConnections.has(channel.guild.id))
+            if (!channel || !channel.guild || !client.canSpeakVC(channel) || client.voiceConnections.has(channel.guild.id))
                 return;
-            // count.math('count', 'add', 1);
-            // console.log(`The ${type} has been done ${count.get('count')} times now!`);
-
             const connection = await channel.join();
             connection.play('./song.ogg');
             await client.db.inc('count');
@@ -57,7 +54,6 @@ module.exports = (client) => {
         if (!permissions) return false;
         if (permissions.has('administrator')) return true;
         if (!permissions.has('viewChannel')) return false;
-        if (!permissions.has('voiceConnect')) return false;
         if (!permissions.has('voiceConnect')) return false;
         if (!channel.userLimit) return true;
         if (channel.userLimit <= channel.voiceMembers.size && !permissions.has('voiceMoveMembers')) return false;
