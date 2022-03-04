@@ -28,6 +28,51 @@ api.set('count', async (ctx) => {
     };
 });
 
+api.set('tos', async (ctx) => {
+    return `<!DOCTYPE html>
+
+<head>
+    <title>Terms of Service</title>
+    <style>
+        body {
+            color: white;
+            background-color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Terms of Service</h1>
+    <p>Please read these terms of service (&quot;terms&quot;, &quot;terms of service&quot;) carefully before using our
+        bot (the &quot;service&quot;).</p>
+    <h3 id="conditions-of-use">Conditions of Use</h3>
+    <p>Usage of this bot is subject to the terms below. By using the bot you agree to these terms.</p>
+    <h3 id="privacy-policy">Privacy Policy</h3>
+    <p>Before you continue using our website we advise you to read our <a href="./privacy">privacy policy</a> regarding
+        our user data collection.</p>
+</body>`
+});
+
+api.set('privacy', async (ctx) => {
+    return `<!DOCTYPE html>
+
+<head>
+    <title>Privacy Policy</title>
+    <style>
+        body {
+            color: white;
+            background-color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Privacy Policy</h1>
+    <p>We do not store any user data. The only data we store is a single number which counts how many times the bot has
+        been used. This is entirely anonymous and has absolutely no user, guild, channel data associated with it.</p>
+</body>`
+});
+
 module.exports = (client) => {
     app.context.client = client;
     app.use(async (ctx) => {
