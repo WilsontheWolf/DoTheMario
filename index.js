@@ -32,7 +32,7 @@ client.on('ready', async () => {
     console.log('Ensuring slash commands');
 
     let res = await client.slashValidate();
-    if(res) console.error(res);
+    if (res) console.error(res);
 });
 
 client.on('messageCreate', async (message) => {
@@ -110,6 +110,10 @@ client.on('guildDelete', () => {
     client.getChannel(client.config.loggingChannel)
         ?.createMessage(`Left a server! Now I have ${client.guilds.size} servers!`)
         .catch(e => console.error('error logging', e));
+});
+
+client.on('error', (e) => {
+    console.error(e);
 });
 
 client.connect().catch(e => {
