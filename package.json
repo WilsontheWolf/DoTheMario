@@ -14,9 +14,9 @@
     "@joshdb/core": "^1.2.7",
     "@joshdb/sqlite": "^1.1.9",
     "dotenv": "^16.0.1",
-    "eris": "^0.16.1",
+    "eris": "^0.17.0",
     "koa": "^2.13.4",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "sodium-native": "3.3.0",
     "topgg-autoposter": "^2.0.1"
   }

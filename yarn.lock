@@ -324,10 +324,10 @@ end-of-stream@^1.1.0, end-of-stream@^1.4.1:
   dependencies:
     once "^1.4.0"
 
-eris@^0.16.1:
-  version "0.16.1"
-  resolved "https://registry.yarnpkg.com/eris/-/eris-0.16.1.tgz#44b0a9220944fc73dd74538cd614826bfbfcde61"
-  integrity sha512-fqjgaddSvUlUjA7s85OvZimLrgCwX58Z6FXOIxdNFJdT6XReJ/LOWZKdew2CaalM8BvN2JKzn98HmKYb3zMhKg==
+eris@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/eris/-/eris-0.17.0.tgz#8d8caa9715eccf27951c9b16ce4249c559ccbb13"
+  integrity sha512-ba7fpe104uw86z8fbX7V1ORMblB7jMJoDsRpiy8BKDQo+kNCRuUXB5xfg/VKGtZ944QroBTEZDuyXCBhKOBplQ==
   dependencies:
     ws "^8.2.3"
   optionalDependencies:
@@ -676,7 +676,7 @@ node-fetch@^2.6.1:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
-node-fetch@^2.6.5:
+node-fetch@^2.6.5, node-fetch@^2.6.7:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
   integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
