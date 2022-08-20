@@ -69,40 +69,9 @@ module.exports = (client) => {
         if (!permissions.has('voiceSpeak')) return false;
         return true;
     };
-    client.slashRespond = async (url, response, hidden = true) => {
-        let request = await fetch(url, {
-            method: 'POST',
-            body: JSON.stringify({
-                type: 4,
-                data: {
-                    content: response,
-                    flags: hidden ? 64 : 0
-                }
-            }),
-            headers: { 'Content-Type': 'application/json' }
-        });
-        if (!request.ok) {
-            console.error('Failed to send', request.url, request.status, await request.text(), response);
-            return '';
-        }
-        return await request.text();
-    };
+
     client.slashValidate = async () => {
-        let commands;
-        try {
-            const request = await fetch(`https://discord.com/api/v8/applications/${client.user.id}/commands`,
-                {
-                    method: 'GET',
-                    headers: {
-                        Authorization: `Bot ${client.config.token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-            if (!request.ok) return `Error ${request.status} getting commands.\n${await request.text()}`;
-            commands = await request.json();
-        } catch (e) {
-            return `Error getting commands.\n${e}`;
-        }
+        const commands = await client.getCommands();
         client.slashCommands.forEach(cmd => {
             let origIndex = commands.findIndex(c => c.name === cmd.name);
             if (origIndex !== -1) {
@@ -115,20 +84,6 @@ module.exports = (client) => {
                     options: cmd.options
                 });
         });
-        try {
-            const request = await fetch(`https://discord.com/api/v8/applications/${client.user.id}/commands`,
-                {
-                    method: 'PUT',
-                    body: JSON.stringify(commands),
-                    headers: {
-                        Authorization: `Bot ${client.config.token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-            if (!request.ok) return `Error ${request.status} updating commands.\n${await request.text()}`;
-            commands = await request.json();
-        } catch (e) {
-            return `Error updating commands.\n${e}`;
-        }
+        await client.bulkEditCommands(commands);
     };
 };

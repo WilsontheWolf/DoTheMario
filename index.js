@@ -6,6 +6,7 @@ const provider = require('@joshdb/sqlite');
 const botLists = require('./misc/botLists');
 const webServer = require('./misc/webServer');
 
+/** @type {import('eris').Client} */
 const client = new Eris(config.token, {
     intents: ['guildMessages', 'guildVoiceStates', 'guilds'],
     maxShards: 'auto',
@@ -70,34 +71,56 @@ client.on('messageCreate', async (message) => {
     }
 });
 
-client.on('rawWS', async (packet) => {
-    if (!packet || !packet.t || !packet.d) return;
-    if (packet.t !== 'INTERACTION_CREATE') return;
-    const data = packet.d;
-    const url = `https://discord.com/api/v8/interactions/${data.id}/${data.token}/callback`;
-    const reply = (content, hidden) =>
-        client.slashRespond(url, content, hidden);
-    // In DM
-    if (!data.guild_id) return await reply(`To use this slash command you need to be in a server. You can invite me [here](https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot%20applications.commands&permissions=3145728).`);
-    let guild = client.guilds.get(data.guild_id);
-    if (!guild) return await reply(`To use this slash command you need to invite the bot user. 
-You can do so [here](https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot%20applications.commands&permissions=3145728).`);
-    let member = guild.members.get(data.member.user.id) || await guild.getRESTMember(data.member.user.id);
-    if (!member) return await reply('I\'m sorry something went wrong.');
-    let command = data.data.name;
-    let options = data.data.options || [];
+// client.on('rawWS', async (packet) => {
+//     if (!packet || !packet.t || !packet.d) return;
+//     if (packet.t !== 'INTERACTION_CREATE') return;
+//     const data = packet.d;
+//     const url = `https://discord.com/api/v8/interactions/${data.id}/${data.token}/callback`;
+//     const reply = (content, hidden) =>
+//         client.slashRespond(url, content, hidden);
+//     // In DM
+//     if (!data.guild_id) return await reply(`To use this slash command you need to be in a server. You can invite me [here](https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot%20applications.commands&permissions=3145728).`);
+//     let guild = client.guilds.get(data.guild_id);
+//     if (!guild) return await reply(`To use this slash command you need to invite the bot user. 
+// You can do so [here](https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot%20applications.commands&permissions=3145728).`);
+//     let member = guild.members.get(data.member.user.id) || await guild.getRESTMember(data.member.user.id);
+//     if (!member) return await reply('I\'m sorry something went wrong.');
+//     let command = data.data.name;
+//     let options = data.data.options || [];
+//     const cmd = client.slashCommands.get(command);
+//     if (!cmd) return await reply('I\'m sorry that command was not found!');
+//     try {
+//         await cmd.run(client, {
+//             guild,
+//             member,
+//             options,
+//         }, reply);
+//     } catch (e) {
+//         console.error(`Error running slash command ${command}\n`, e);
+//         reply('I\'m sorry an error occurred. ```\n' + e.toString() + '\n```');
+//     }
+// });
+
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.guildID) return await interaction.createMessage({content: `To use this slash command you need to invite the bot user. 
+You can do so [here](https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot%20applications.commands&permissions=3145728).`, flags: 64});
+    if (!interaction.member) {
+        console.error('No member found for interaction. Please fix me!!!!');
+        return await interaction.createMessage({content: 'I\'m sorry something went wrong.', flags: 64});
+    }
+    const command = interaction.data.name;
+    if (!command) {
+        console.error('No command found for interaction. Please fix me!!!!');
+        return await interaction.createMessage({content: 'I\'m sorry something went wrong.', flags: 64});
+    }
     const cmd = client.slashCommands.get(command);
-    if (!cmd) return await reply('I\'m sorry that command was not found!');
+    if (!cmd) return await interaction.createMessage({content: 'I\'m sorry that command was not found!', flags: 64});
     try {
-        await cmd.run(client, {
-            guild,
-            member,
-            options,
-        }, reply);
+        await cmd.run(client, interaction);
     } catch (e) {
         console.error(`Error running slash command ${command}\n`, e);
-        reply('I\'m sorry an error occurred. ```\n' + e.toString() + '\n```');
-    }
+        interaction.createMessage({content: 'I\'m sorry an error occurred. ```\n' + e.toString() + '\n```', flags: 64});
+    };
 });
 
 client.on('guildCreate', () => {

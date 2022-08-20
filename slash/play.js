@@ -6,12 +6,18 @@ module.exports = {
             name: 'channel',
             description: 'The channel to play in. If none is provided I will join your current voice channel.',
             type: 7,
-            required: false
+            required: false,
+            // Voice and Stage
+            channel_types: [2, 13]
         }
     ]
 };
 // eslint-disable-next-line no-unused-vars
-module.exports.run = async (client, { guild, member, options }, reply) => {
+module.exports.run = async (client, interaction) => {
+    const guild = client.guilds.get(interaction.guildID);
+    const member = interaction.member;
+    const options = interaction.data?.options || [];
+    const reply = (content) => interaction.createMessage({content, flags: 64});
     if (client.voiceConnections.has(guild.id)) return await reply(`I am already playing music in <#${client.voiceConnections.get(guild.id).channelID}>! Please try again when I am done.`);
     let channel = options.find(o => o.name === 'channel');
     if (channel) channel = guild.channels.get(channel.value);

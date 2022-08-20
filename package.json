@@ -10,14 +10,14 @@
   "license": "MIT",
   "private:": true,
   "dependencies": {
-    "@discordjs/opus": "0.7.0",
+    "@discordjs/opus": "0.8.0",
     "@joshdb/core": "^1.2.7",
     "@joshdb/sqlite": "^1.1.9",
     "dotenv": "^16.0.1",
-    "eris": "^0.17.0",
+    "eris": "^0.17.1",
     "koa": "^2.13.4",
     "node-fetch": "^2.6.7",
-    "sodium-native": "3.3.0",
+    "sodium-native": "3.4.1",
     "topgg-autoposter": "^2.0.1"
   }
 }
