@@ -33,7 +33,19 @@ module.exports = (client) => {
         try {
             if (!channel || !channel.guild || !client.canSpeakVC(channel) || client.voiceConnections.has(channel.guild.id))
                 return;
-            const connection = await channel.join();
+            const connection = await channel.join({ selfDeaf: true });
+            // Stage Channels
+            if (channel.type === 13) {
+                try {
+                    const perms = channel.permissionsOf(client.user.id);
+                    if (perms.has('voiceMuteMembers') || perms.has('administrator'))
+                        await channel.guild.editVoiceState({ suppress: false });
+                    else if (perms.has('voiceRequestToSpeak'))
+                        await channel.guild.editVoiceState({ requestToSpeakTimestamp: new Date().toISOString() });
+                } catch (e) {
+                    console.error('Error attempting to escalate stage channel permissions.\n', e);
+                }
+            }
             connection.play('./song.ogg');
             await client.db.inc('count');
             connection.on('end', async () => {
@@ -63,6 +75,8 @@ module.exports = (client) => {
     client.canSpeakVC = (channel) => {
         if (!client.canJoinVC(channel)) return false;
         if (client.user.id === channel.guild.ownerID) return true;
+        // No perms for stage channels
+        if (channel.type === 13) return true;
         const permissions = channel.permissionsOf(client.user.id);
         if (!permissions) return false;
         if (permissions.has('administrator')) return true;
