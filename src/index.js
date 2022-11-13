@@ -33,7 +33,7 @@ let constants = {
 
 const postBotLists = await botLists(constants.id);
 
-const server = webServer(constants);
+const server = webServer(constants, port);
 
 const updateData = async ({ type, data }) => {
     if (type === 'guilds') {
