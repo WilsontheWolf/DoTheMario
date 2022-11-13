@@ -1,6 +1,6 @@
 # Do The Mario
 
-[![invite bot](https://img.shields.io/endpoint.svg?logo=discord&logoColor=white&url=https%3A%2F%2Fdtm.antti.codes%2Finvites&style=for-the-badge)](https://discord.com/api/oauth2/authorize?client_id=607273553573838860&permissions=3145728&scope=bot)
+[![invite bot](https://img.shields.io/endpoint.svg?logo=discord&logoColor=white&url=https%3A%2F%2Fdtm.antti.codes%2Finvites&style=for-the-badge)](https://dtm.antti.codes/invite)
 [![mario count](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fdtm.antti.codes%2Fcount&style=for-the-badge)](https://forthebadge.com)
 [![Discord](https://img.shields.io/discord/747881181676044378.svg?label=Join%20the%20Discord%20Server&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=for-the-badge)](https://discord.gg/jRN7SZB)
 [![forthebadge](https://forthebadge.com/images/badges/uses-badges.svg)](https://forthebadge.com)

@@ -1,4 +1,4 @@
-module.exports = {
+const cmd = {
     name: 'play',
     desc: 'I will sing you a song!',
     options: [
@@ -13,7 +13,7 @@ module.exports = {
     ]
 };
 // eslint-disable-next-line no-unused-vars
-module.exports.run = async (client, interaction) => {
+cmd.run = async (client, interaction) => {
     const guild = client.guilds.get(interaction.guildID);
     const member = interaction.member;
     const options = interaction.data?.options || [];
@@ -29,3 +29,5 @@ module.exports.run = async (client, interaction) => {
     await reply(`Joining <#${channel.id}>!`);
     return client.play(channel);
 };
+
+export { cmd };

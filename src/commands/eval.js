@@ -1,8 +1,10 @@
-module.exports = {
+import Util from 'node:util';
+
+const cmd = {
     name: 'eval'
 };
 // eslint-disable-next-line no-unused-vars
-module.exports.run = async (client, message, args) => {
+cmd.run = async (client, message, args) => {
     const embed = {
         footer: {
             text: `Eval command executed by ${message.author.username}`
@@ -19,13 +21,14 @@ module.exports.run = async (client, message, args) => {
             code = '( async () => {' + code + '})()';
         response = await eval(code);
         if (typeof response !== 'string') {
-            response = require('util').inspect(response, { depth: 3 });
+            response = Util.inspect(response, { depth: 3 });
         }
     } catch (err) {
         e = true;
         response = err.toString();
         try {
-            const Linter = require('eslint').Linter;
+
+            const Linter = await (await import('eslint')).Linter;
             let linter = new Linter();
             let lint = linter.verify(code, { 'env': { 'commonjs': true, 'es2021': true, 'node': true }, 'extends': 'eslint:recommended', 'parserOptions': { 'ecmaVersion': 12 } });
             let error = lint.find(e => e.fatal);
@@ -55,3 +58,5 @@ ${response}`);
     }
     await message.channel.createMessage({ embed });
 };
+
+export {cmd};

@@ -1,10 +1,11 @@
-const Koa = require('koa');
+import Koa from 'koa';
+import fs from 'node:fs/promises';
+
 const app = new Koa();
-const fs = require('fs/promises');
 const api = new Map();
 
 api.set('invites', async (ctx) => {
-    if (!ctx.client.guilds?.size) return {
+    if (!ctx.data.guilds) return {
         schemaVersion: 1,
         label: 'invite',
         message: 'Loading server count',
@@ -13,22 +14,80 @@ api.set('invites', async (ctx) => {
     return {
         schemaVersion: 1,
         label: 'invite',
-        message: `${ctx.client.guilds.size} servers`,
+        message: `${ctx.data.guilds} servers`,
         color: 'success'
     };
+});
+
+api.set('invite', (ctx) => {
+    if (!ctx.constants.id) {
+        ctx.status = 503;
+        return `<!DOCTYPE html>
+        
+        <head>
+            <title>Error</title>
+            <style>
+                body {
+                    color: white;
+                    background-color: black;
+                }
+            </style>
+            <meta http-equiv="refresh" content="3">
+        </head>
+        
+        <body>
+            <h1>Error</h1>
+            <p>The invite URL is currently unavailable. Please try again in a few seconds.</p>
+        </body>`;
+    }
+    ctx.redirect(`https://discord.com/oauth2/authorize?client_id=${ctx.constants.id}&scope=bot%20applications.commands&permissions=3145728`);
+    ctx.status = 308;
+    return `Redirecting to https://discord.com/oauth2/authorize?client_id=${ctx.constants.id}&scope=bot%20applications.commands&permissions=3145728`;
 });
 
 api.set('count', async (ctx) => {
-    const [label, message] = (ctx.client.config.countMessage || 'I have been used {{count}} times.').split('{{count}}');
+    const [label, message] = (ctx.constants.countMessage || 'I have been used {{count}} times').split('{{count}}');
     return {
         schemaVersion: 1,
         label,
-        message: `${await ctx.client.db.get('count') || 0}${message}`,
+        message: `${await ctx.data.count || 0}${message}`,
         color: 'success'
     };
 });
 
-api.set('tos', async (ctx) => {
+api.set('shards', (ctx) => {
+    if (!ctx.data.shards) {
+        ctx.status = 503;
+        return {
+            Error: 'No shard data available'
+        };
+    }
+    return ctx.data.shards;
+});
+
+api.set('health', (ctx) => {
+    if (!ctx.data.shards) {
+        ctx.status = 503;
+        return {
+            Error: 'No shard data available'
+        };
+    }
+    const healthy = ctx.data.shards.every(shard => shard.healthy);
+    const ready = ctx.data.shards.every(shard => shard.ready);
+
+    if(!healthy || !ready) {
+        ctx.status = 503;
+    }
+
+    return {
+        healthy,
+        ready,
+    };
+});
+
+    
+
+api.set('tos', async () => {
     return `<!DOCTYPE html>
 
 <head>
@@ -50,10 +109,10 @@ api.set('tos', async (ctx) => {
     <h3 id="privacy-policy">Privacy Policy</h3>
     <p>Before you continue using our website we advise you to read our <a href="./privacy">privacy policy</a> regarding
         our user data collection.</p>
-</body>`
+</body>`;
 });
 
-api.set('privacy', async (ctx) => {
+api.set('privacy', async () => {
     return `<!DOCTYPE html>
 
 <head>
@@ -70,28 +129,34 @@ api.set('privacy', async (ctx) => {
     <h1>Privacy Policy</h1>
     <p>We do not store any user data. The only data we store is a single number which counts how many times the bot has
         been used. This is entirely anonymous and has absolutely no user, guild, channel data associated with it.</p>
-</body>`
+</body>`;
 });
 
-module.exports = (client) => {
-    app.context.client = client;
+const updateConstants = (constants) => {
+    app.context.constants = constants;
+
+};
+
+const updateData = (data) => {
+    app.context.data = data;
+};
+
+export default (startingConst = {}, port) => {
+
+    updateConstants(startingConst);
+    updateData({});
+
     app.use(async (ctx) => {
         let { path, url } = ctx;
         let resp;
+
+
         try {
             let get = path.replace(/^\/+|(\/)\/+|\/+$/g, '$1');
             if (!get) {
-                const constants = {
-                    bot: client.user.username,
-                    id: client.user.id,
-                    catchPrase: client.config.catchPrase,
-                    tag: `${client.user.username}#${client.user.discriminator}`,
-                    song: client.config.name,
-                    base: encodeURIComponent(client.config.baseURL)
-                };
-                const file = await fs.readFile('./index.html');
+                const file = await fs.readFile('./public/index.html');
                 resp = file.toString().replace(/{{\s*(\w+)\s*}}/g, (orig, value) => {
-                    if(constants[value]) return constants[value];
+                    if (ctx.constants[value]) return ctx.constants[value];
                     else return orig;
                 });
             }
@@ -116,7 +181,12 @@ module.exports = (client) => {
         ctx.body = resp;
     });
 
-    app.listen(client.config.port || 3000);
-    console.log(`Starting on port ${client.config.port || 3000}`);
+    app.listen(port || 3000);
+    console.log(`Starting on port ${port || 3000}`);
+
+    return {
+        updateConstants,
+        updateData,
+    };
 
 };

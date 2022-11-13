@@ -1,12 +1,14 @@
 module.exports = {
     'env': {
-        'commonjs': true,
         'es2021': true,
         'node': true
     },
     'extends': 'eslint:recommended',
+    'overrides': [
+    ],
     'parserOptions': {
-        'ecmaVersion': 12
+        'ecmaVersion': 'latest',
+        'sourceType': 'module'
     },
     'rules': {
         'indent': [
@@ -33,5 +35,6 @@ module.exports = {
                     'allowEmptyCatch': true
                 }
             ]
+
     }
 };

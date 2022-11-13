@@ -1,13 +1,11 @@
-const fetch = require('node-fetch');
-
-module.exports = (client) => {
-    client.loadCommand = (cmd) => {
+export default (client) => {
+    client.loadCommand = async (cmd) => {
         try {
             let name = cmd.split('.');
             if (name.length !== 1) name.pop();
             name = name.join('.');
             console.info(`Loading command ${name}...`);
-            const c = require(`../commands/${cmd}`);
+            const c = await (await import(`../commands/${cmd}`)).cmd;
             client.commands.set(c.name, c);
         } catch (e) {
             console.error(`Error loading command ${cmd}:`);
@@ -15,13 +13,13 @@ module.exports = (client) => {
             return e;
         }
     };
-    client.loadSlashCommand = (cmd) => {
+    client.loadSlashCommand = async (cmd) => {
         try {
             let name = cmd.split('.');
             if (name.length !== 1) name.pop();
             name = name.join('.');
             console.info(`Loading slash command ${name}...`);
-            const c = require(`../slash/${cmd}`);
+            const c = await(await import(`../slash/${cmd}`)).cmd;
             client.slashCommands.set(c.name, c);
         } catch (e) {
             console.error(`Error loading slash command ${cmd}:`);
@@ -47,7 +45,9 @@ module.exports = (client) => {
                 }
             }
             connection.play('./song.ogg');
-            await client.db.inc('count');
+            client.updateData?.({
+                type: 'count'
+            });
             connection.on('end', async () => {
                 try {
                     await channel.leave();
