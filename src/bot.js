@@ -38,37 +38,14 @@ const createClient = async (options, ready, updateData) => {
     client.on('shardDisconnect', (err, id) => {
         console.warn(`Shard ${id} disconnected!`);
         console.warn(err);
-
-        updateData({
-            type: 'shard',
-            data: {
-                id,
-                healthy: false,
-            }
-        });
     });
 
     client.on('shardResume', (id) => {
         console.log(`Shard ${id} resumed!`);
-
-        updateData({
-            type: 'shard',
-            data: {
-                id,
-                healthy: true,
-            }
-        });
     });
 
     client.on('shardReady', (id) => {
         console.log(`shard ${id} ready`);
-        updateData({
-            type: 'shard',
-            data: {
-                id,
-                healthy: true,
-            }
-        });
     });
 
     client.on('messageCreate', async (message) => {

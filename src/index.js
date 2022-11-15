@@ -6,12 +6,6 @@ import 'dotenv/config';
 import config from './config.js';
 import createClient from './bot.js';
 
-const status = {
-    ready: false,
-    healthy: true,
-    guilds: null,
-};
-
 const db = new Josh({
     name: 'db',
     provider
@@ -29,29 +23,47 @@ let constants = {
     song: config.name,
     base: encodeURIComponent(config.baseURL),
     countMessage: config.countMessage,
+    uptimeBadge: config.uptimeBadge || 'https://img.shields.io/static/v1?label=Uptime&message=%3F%3F%25&color=inactive&style=for-the-badge',
+};
+
+let client;
+
+const genShardData = () => {
+    if (!client?.shards) return;
+    const shardData = client.shards.map(shard => ({
+        id: shard.id,
+        status: shard.status,
+        ready: shard.ready,
+        latency: shard.latency !== Infinity ? shard.latency : null,
+        healthy: shard.ready && (shard.latency !== Infinity ? shard.latency < 2000 : true),
+        guilds: 0,
+    }));
+
+    Object.values(client.guildShardMap).forEach(shardId => {
+        const shard = shardData.find(shard => shard.id === shardId);
+        if (!shard) return console.warn('Shard not found', shardId);
+        shard.guilds++;
+    });
+
+    return shardData;
 };
 
 const postBotLists = await botLists(constants.id);
 
-const server = webServer(constants, config.port);
+const server = webServer(constants, config.port, genShardData);
 
 const updateData = async ({ type, data }) => {
     if (type === 'guilds') {
-        guilds = data;
         postBotLists(client.guilds.size, client.shards.size);
     }
     else if (type === 'count') {
         await db.inc('count');
-    } else if(type === 'shard') {
-        status.healthy = data.healthy;
-    }
+    } 
     else console.warn('Unknown type', type);
-    server.updateData({ guilds, count: await db.get('count'), shards: [status] });
+    server.updateData({ count: await db.get('count') });
 };
 
 const ready = async (client) => {
-    status.ready = true;
-    status.guilds = client.guilds.size;
     guilds = client.guilds.size;
     constants = {
         ...constants,
@@ -60,12 +72,12 @@ const ready = async (client) => {
         tag: `${client.user.username}#${client.user.discriminator}`,
     };
     server.updateConstants(constants);
-    server.updateData({ guilds, count: await db.get('count'), shards: [status] });
+    server.updateData({ count: await db.get('count') });
     console.log(`Ready! Serving ${client.guilds.size} guilds.`);
     postBotLists(client.guilds.size, client.shards.size);
 };
 
-const client = await createClient({
+client = await createClient({
     token: config.token,
     maxShards: 'auto',
 }, ready, updateData);

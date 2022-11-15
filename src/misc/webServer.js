@@ -5,16 +5,19 @@ const app = new Koa();
 const api = new Map();
 
 api.set('invites', async (ctx) => {
-    if (!ctx.data.guilds) return {
+    const shards = ctx.getShardData?.();
+    const guilds = shards?.reduce((a, b) => a + b.guilds ?? 0, 0);
+    if (!shards || !guilds) return {
         schemaVersion: 1,
         label: 'invite',
         message: 'Loading server count',
         color: 'red'
     };
+
     return {
         schemaVersion: 1,
         label: 'invite',
-        message: `${ctx.data.guilds} servers`,
+        message: `${guilds} servers`,
         color: 'success'
     };
 });
@@ -56,26 +59,30 @@ api.set('count', async (ctx) => {
 });
 
 api.set('shards', (ctx) => {
-    if (!ctx.data.shards) {
+    const shards = ctx.getShardData?.();
+    if (!shards) {
         ctx.status = 503;
         return {
             Error: 'No shard data available'
         };
     }
-    return ctx.data.shards;
+    return shards;
 });
 
 api.set('health', (ctx) => {
-    if (!ctx.data.shards) {
+    const shards = ctx.getShardData?.();
+
+    if (!shards) {
         ctx.status = 503;
         return {
-            Error: 'No shard data available'
+            Error: 'No health data available'
         };
     }
-    const healthy = ctx.data.shards.every(shard => shard.healthy);
-    const ready = ctx.data.shards.every(shard => shard.ready);
 
-    if(!healthy || !ready) {
+    const healthy = shards.every(shard => shard.healthy);
+    const ready = shards.every(shard => shard.ready);
+
+    if (!healthy || !ready) {
         ctx.status = 503;
     }
 
@@ -85,7 +92,7 @@ api.set('health', (ctx) => {
     };
 });
 
-    
+
 
 api.set('tos', async () => {
     return `<!DOCTYPE html>
@@ -136,15 +143,16 @@ const updateConstants = (constants) => {
     app.context.constants = constants;
 
 };
-
 const updateData = (data) => {
     app.context.data = data;
 };
 
-export default (startingConst = {}, port) => {
+export default (startingConst = {}, port, getShardData) => {
 
     updateConstants(startingConst);
     updateData({});
+
+    app.context.getShardData = getShardData;
 
     app.use(async (ctx) => {
         let { path, url } = ctx;

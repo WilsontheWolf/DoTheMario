@@ -15,6 +15,9 @@ const config = {
     // Shows on the website
     catchPrase: 'Do do do...',
     // Base url for dashboard
-    baseURL: 'https://dtm.antti.codes/'
+    baseURL: 'https://dtm.antti.codes/',
+    // The path to the uptime badge
+    // Leave this blank if you don't have a uptime badge
+    uptimeBadge: 'https://status.antti.codes/api/badge/3/uptime?style=for-the-badge&label=uptime&labelSuffix=',
 };
 export default config;
