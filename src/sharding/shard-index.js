@@ -83,7 +83,3 @@ manager.on('exit', () => {
     client.disconnect({ reconnect: false });
     process.exit(0);
 });
-
-setInterval(() => {
-    process.exit(1);
-}, 1000 * 5);
