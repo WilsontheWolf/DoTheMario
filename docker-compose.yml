@@ -1,0 +1,18 @@
+version: '3.5'
+
+services:
+  bot:
+    image: ghcr.io/wilsonthewolf/dothemario:latest
+    container_name: mario
+    env_file:
+      - .env
+    environment:
+      - SCRIPT_NAME=start:sharder
+      # This can be start:sharder for the multiprocess version or start:single for the single process version
+      # When blank defaults to start:single
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    stop_grace_period: 10s
+    ports:
+      - 3000:3000
