@@ -1,3 +1,5 @@
+import { logger } from '../misc/logger.js';
+
 const cmd = {
     name: 'reboot'
 };
@@ -5,8 +7,11 @@ const cmd = {
 cmd.run = async (client, message, args) => {
     await message.channel.createMessage('rebooting...');
     await client.disconnect();
-    console.log(`Reboot triggered by ${message.author.username}#${message.author.discriminator}`);
-    process.exit();
+    logger.log(`Reboot triggered by ${message.author.username}#${message.author.discriminator}`);
+    await client.disconnect({
+        reconnect: false
+    });
+    process.exit(0);
 };
 
 export { cmd };

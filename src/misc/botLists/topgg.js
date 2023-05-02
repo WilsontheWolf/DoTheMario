@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import { logger } from '../logger.js';
 
 const topgg = async ({ guilds, shards, id }, token) => {
     const data = {
@@ -16,8 +17,8 @@ const topgg = async ({ guilds, shards, id }, token) => {
         })
             .then(res => res.ok ? res : Promise.reject(`Status ${res.status}`));
     } catch (e) {
-        console.error('Error sending top.gg data!');
-        console.error(e);
+        logger.error('Error sending top.gg data!');
+        logger.error(e);
     }
 
 };

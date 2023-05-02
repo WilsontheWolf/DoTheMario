@@ -1,8 +1,39 @@
 import Koa from 'koa';
 import fs from 'node:fs/promises';
+import { logger } from './logger.js';
 
 const app = new Koa();
 const api = new Map();
+const pages = new Map();
+
+const getPage = async (page) => {
+    if (pages.has(page)) return pages.get(page);
+    const file = await fs.readFile(`./public/${page}.html`, 'utf8').catch(() => null);
+    if (!file) return null;
+    if (process.env.NODE_ENV !== 'development')
+        pages.set(page, file);
+    return file;
+};
+
+const renderPage = async (ctx, page, title, vars, useTemplate = true) => {
+    const file = await getPage(page);
+    if (!file) return null;
+    let html = file;
+    if (useTemplate) {
+        const template = await getPage('template');
+        if (!template) return null;
+        html = template.replace('{{content}}', html)
+            .replace('{{title}}', title || ctx.constants.bot || 'Bot');
+    }
+
+    html = html.replace(/{{\s*(\w+)\s*}}/g, (orig, value) => {
+        if (vars?.[value]) return vars[value];
+        else if (ctx.constants[value]) return ctx.constants[value];
+        else return orig;
+    });
+
+    return html;
+};
 
 api.set('invites', async (ctx) => {
     const shards = ctx.getShardData?.();
@@ -22,30 +53,28 @@ api.set('invites', async (ctx) => {
     };
 });
 
-api.set('invite', (ctx) => {
+api.set('invite', async (ctx) => {
     if (!ctx.constants.id) {
         ctx.status = 503;
-        return `<!DOCTYPE html>
-        
-        <head>
-            <title>Error</title>
-            <style>
-                body {
-                    color: white;
-                    background-color: black;
-                }
-            </style>
-            <meta http-equiv="refresh" content="3">
-        </head>
-        
-        <body>
-            <h1>Error</h1>
-            <p>The invite URL is currently unavailable. Please try again in a few seconds.</p>
-        </body>`;
+        return await renderPage(ctx, 'error', 'Error', {
+            message: 'The invite URL is currently unavailable. Please try again in a few seconds.'
+        });
     }
     ctx.redirect(`https://discord.com/oauth2/authorize?client_id=${ctx.constants.id}&scope=bot%20applications.commands&permissions=3145728`);
     ctx.status = 308;
     return `Redirecting to https://discord.com/oauth2/authorize?client_id=${ctx.constants.id}&scope=bot%20applications.commands&permissions=3145728`;
+});
+
+api.set('support', async (ctx) => {
+    if (ctx.constants.supportServer) {
+        ctx.redirect(ctx.constants.supportServer);
+        ctx.status = 308;
+        return `Redirecting to ${ctx.constants.supportServer}`;
+    }
+    ctx.status = 503;
+    return await renderPage(ctx, 'error', 'Error', {
+        message: 'It looks like the support server URL is not set. Please contact the bot owner.'
+    });
 });
 
 api.set('count', async (ctx) => {
@@ -94,49 +123,12 @@ api.set('health', (ctx) => {
 
 
 
-api.set('tos', async () => {
-    return `<!DOCTYPE html>
-
-<head>
-    <title>Terms of Service</title>
-    <style>
-        body {
-            color: white;
-            background-color: black;
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Terms of Service</h1>
-    <p>Please read these terms of service (&quot;terms&quot;, &quot;terms of service&quot;) carefully before using our
-        bot (the &quot;service&quot;).</p>
-    <h3 id="conditions-of-use">Conditions of Use</h3>
-    <p>Usage of this bot is subject to the terms below. By using the bot you agree to these terms.</p>
-    <h3 id="privacy-policy">Privacy Policy</h3>
-    <p>Before you continue using our website we advise you to read our <a href="./privacy">privacy policy</a> regarding
-        our user data collection.</p>
-</body>`;
+api.set('tos', async (ctx) => {
+    return await renderPage(ctx, 'tos', 'Terms of Service');
 });
 
-api.set('privacy', async () => {
-    return `<!DOCTYPE html>
-
-<head>
-    <title>Privacy Policy</title>
-    <style>
-        body {
-            color: white;
-            background-color: black;
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Privacy Policy</h1>
-    <p>We do not store any user data. The only data we store is a single number which counts how many times the bot has
-        been used. This is entirely anonymous and has absolutely no user, guild, channel data associated with it.</p>
-</body>`;
+api.set('privacy', async (ctx) => {
+    return await renderPage(ctx, 'privacy', 'Privacy Policy');
 });
 
 const updateConstants = (constants) => {
@@ -162,11 +154,8 @@ export default (startingConst = {}, port, getShardData) => {
         try {
             let get = path.replace(/^\/+|(\/)\/+|\/+$/g, '$1');
             if (!get) {
-                const file = await fs.readFile('./public/index.html');
-                resp = file.toString().replace(/{{\s*(\w+)\s*}}/g, (orig, value) => {
-                    if (ctx.constants[value]) return ctx.constants[value];
-                    else return orig;
-                });
+                resp = await renderPage(ctx, 'index');
+                ctx.status = 200;
             }
             else {
                 let route = api.get(get);
@@ -181,8 +170,8 @@ export default (startingConst = {}, port, getShardData) => {
                 ctx.status = 404;
             }
         } catch (e) {
-            console.error(`Error serving ${url}`);
-            console.error(e);
+            logger.error(`Error serving ${url}`);
+            logger.error(e);
             ctx.status = 500;
             resp = { message: 'internal server error' };
         }
@@ -190,7 +179,7 @@ export default (startingConst = {}, port, getShardData) => {
     });
 
     app.listen(port || 3000);
-    console.log(`Starting on port ${port || 3000}`);
+    logger.log(`Starting on port ${port || 3000}`);
 
     return {
         updateConstants,

@@ -5,15 +5,18 @@ import provider from '@joshdb/sqlite';
 import 'dotenv/config';
 import config from './config.js';
 import createClient from './bot.js';
+import getManager from './misc/CountManager.js';
+import { logger, prefix } from './misc/logger.js';
 
+prefix.shift();
 const db = new Josh({
     name: 'db',
     provider
 });
 
-await db.ensure('count', 0);
+getManager(db);
 
-let guilds;
+await db.ensure('count', 0);
 
 let constants = {
     bot: config.name,
@@ -24,6 +27,7 @@ let constants = {
     base: encodeURIComponent(config.baseURL),
     countMessage: config.countMessage,
     uptimeBadge: config.uptimeBadge || 'https://img.shields.io/static/v1?label=Uptime&message=%3F%3F%25&color=inactive&style=for-the-badge',
+    supportServer: config.supportServer,
 };
 
 let client;
@@ -41,7 +45,7 @@ const genShardData = () => {
 
     Object.values(client.guildShardMap).forEach(shardId => {
         const shard = shardData.find(shard => shard.id === shardId);
-        if (!shard) return console.warn('Shard not found', shardId);
+        if (!shard) return logger.warn('Shard not found', shardId);
         shard.guilds++;
     });
 
@@ -52,19 +56,18 @@ const postBotLists = await botLists(constants.id);
 
 const server = webServer(constants, config.port, genShardData);
 
-const updateData = async ({ type, data }) => {
+const updateData = async ({ type }) => {
     if (type === 'guilds') {
         postBotLists(client.guilds.size, client.shards.size);
     }
     else if (type === 'count') {
         await db.inc('count');
     } 
-    else console.warn('Unknown type', type);
+    else logger.warn('Unknown type', type);
     server.updateData({ count: await db.get('count') });
 };
 
 const ready = async (client) => {
-    guilds = client.guilds.size;
     constants = {
         ...constants,
         bot: client.user.username,
@@ -73,7 +76,6 @@ const ready = async (client) => {
     };
     server.updateConstants(constants);
     server.updateData({ count: await db.get('count') });
-    console.log(`Ready! Serving ${client.guilds.size} guilds.`);
     postBotLists(client.guilds.size, client.shards.size);
 };
 
@@ -83,4 +85,10 @@ client = await createClient({
 }, ready, updateData);
 
 
-client.db = db;
+process.on('SIGINT', async () => {
+    logger.log('Received SIGINT, shutting down...');
+    await client.disconnect({
+        reconnect: false
+    });
+    process.exit(0);
+});

@@ -1,4 +1,5 @@
 import Util from 'node:util';
+import { logger } from '../misc/logger.js';
 
 const cmd = {
     name: 'eval'
@@ -48,15 +49,15 @@ ${' '.repeat(error.column - 1)}${'^'.repeat(length)}
     embed.title = e ? '**Error**' : '**Success**';
     embed.color = e ? 0xe74c3c : 0x2ecc71;
     embed.description = `\`\`\`${response.substr(0, 2042)}\`\`\``;
-    if (length >= 2049) {
-        console.debug(`An eval command executed by ${message.author.username}'s response was too long (${length}/2048) the response was:
+    if (length >= 4097) {
+        logger.debug(`An eval command executed by ${message.author.username}'s response was too long (${length}/4096) the response was:
 ${response}`);
         embed.fields = [{
             name: 'Note:',
-            value: `The response was too long with a length of \`${length}/2048\` characters. it was logged to the console`
+            value: `The response was too long with a length of \`${length}/4096\` characters. it was logged to the console`
         }];
     }
-    await message.channel.createMessage({ embed });
+    await message.channel.createMessage({ embeds: [embed] });
 };
 
 export {cmd};

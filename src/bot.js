@@ -1,10 +1,18 @@
-import { Client } from 'eris';
+import { Client } from '@projectdysnomia/dysnomia';
+import { handleToken } from './misc/token.js';
 import config from './config.js';
 import fs from 'node:fs/promises';
 import functions from './misc/functions.js';
+import { logger } from './misc/logger.js';
 
+/**
+ * @param {import('@projectdysnomia/dysnomia').ClientOptions} options 
+ * @param {function?} ready 
+ * @param {function?} updateData 
+ * @returns 
+ */
 const createClient = async (options, ready, updateData) => {
-    const token = options.token;
+    const token = handleToken(options.token);
 
     if (!token) throw new Error('No token provided.');
 
@@ -26,26 +34,30 @@ const createClient = async (options, ready, updateData) => {
             name: client.config.name || 'music',
             type: 2
         });
-        console.log(`Logged in as ${client.user.username}#${client.user.discriminator}!`);
-        console.log(`I'm in ${client.guilds.size} servers.`);
-        console.log('Ensuring slash commands');
+        logger.log(`Logged in as ${client.user.username}#${client.user.discriminator}!`);
+        logger.log(`I'm in ${client.guilds.size} servers.`);
 
         ready?.(client);
+        
+        if(options.isSharded && !options.isMainChild) return;
+
+        logger.log('Ensuring slash commands');
         let res = await client.slashValidate();
-        if (res) console.error(res);
+        if (res) logger.error(res);
     });
 
     client.on('shardDisconnect', (err, id) => {
-        console.warn(`Shard ${id} disconnected!`);
-        console.warn(err);
+        logger.warn(`Shard ${id} disconnected!`);
+        if (err)
+            logger.warn(err);
     });
 
     client.on('shardResume', (id) => {
-        console.log(`Shard ${id} resumed!`);
+        logger.log(`Shard ${id} resumed!`);
     });
 
     client.on('shardReady', (id) => {
-        console.log(`shard ${id} ready`);
+        logger.log(`shard ${id} ready`);
     });
 
     client.on('messageCreate', async (message) => {
@@ -54,22 +66,33 @@ const createClient = async (options, ready, updateData) => {
         if (!message.guildID) return;
         if (!message.member) return;
         const guild = message.member.guild;
-        const prefixMention = new RegExp(`^<@!?${client.user.id}>$`);
+        const fullMention = new RegExp(`^<@!?${client.user.id}>$`);
+        const prefixMention = new RegExp(`^<@!?${client.user.id}>\\s+`);
 
         // A user just pinged me. Attempt to join their voice channel.
-        if (message.content.match(prefixMention))
+        if (message.content.match(fullMention))
             return client.play(guild.channels.get(message.member.voiceState.channelID));
 
         // Admins only can run commands.
         if (!client.config.admins.includes(message.author.id)) return;
 
+        let content;
         // Prefix Check
-        if (!message.content.startsWith(client.config.prefix)) return;
+        if (message.content.startsWith(client.config.prefix)) {
+            content = message.content
+                .slice(client.config.prefix.length)
+                .trim();
+        }
+        else if (prefixMention.test(message.content)) {
+            const match = message.content.match(prefixMention);
+            content = message.content
+                .slice(match[0].length)
+                .trim();
+        }
+        if (!content) return;
 
-        const args = message.content
-            .slice(client.config.prefix.length)
-            .trim()
-            .split(/ +/g);
+        const args = content
+            .split(/\s+/g);
         const command = args.shift().toLowerCase();
 
         const cmd = client.commands.get(command);
@@ -78,23 +101,23 @@ const createClient = async (options, ready, updateData) => {
         try {
             await cmd.run(client, message, args);
         } catch (e) {
-            console.error(`Error running ${command}\n`, e);
+            logger.error(`Error running ${command}\n`, e);
             message.channel.createMessage('Error running command. ```\n' + e.toString() + '\n```');
         }
     });
 
     client.on('interactionCreate', async (interaction) => {
         if (!interaction.guildID) return await interaction.createMessage({
-            content: `To use this slash command you need to invite the bot user. 
+            content: `To use slash commands you need to invite the bot user. 
 You can do so [here](https://discord.com/oauth2/authorize?client_id=${client.user.id}&scope=bot%20applications.commands&permissions=3145728).`, flags: 64
         });
         if (!interaction.member) {
-            console.error('No member found for interaction. Please fix me!!!!');
+            logger.error('No member found for interaction. Please fix me!!!!');
             return await interaction.createMessage({ content: 'I\'m sorry something went wrong.', flags: 64 });
         }
         const command = interaction.data.name;
         if (!command) {
-            console.error('No command found for interaction. Please fix me!!!!');
+            logger.error('No command found for interaction. Please fix me!!!!');
             return await interaction.createMessage({ content: 'I\'m sorry something went wrong.', flags: 64 });
         }
         const cmd = client.slashCommands.get(command);
@@ -102,15 +125,15 @@ You can do so [here](https://discord.com/oauth2/authorize?client_id=${client.use
         try {
             await cmd.run(client, interaction);
         } catch (e) {
-            console.error(`Error running slash command ${command}\n`, e);
-            interaction.createMessage({ content: 'I\'m sorry an error occurred. ```\n' + e.toString() + '\n```', flags: 64 });
+            logger.error(`Error running slash command ${command}\n`, e);
+            interaction.createMessage({ content: 'I\'m sorry an error occurred. ```\n' + e.toString() + '\n```', flags: 64 }).catch(e => logger.error('error sending error message', e));
         }
     });
 
     client.on('guildCreate', () => {
         client.getChannel(client.config.loggingChannel)
             ?.createMessage(`Joined a new server! Now I have ${client.guilds.size} servers!`)
-            .catch(e => console.error('error logging', e));
+            .catch(e => logger.error('error logging', e));
 
         updateData?.({
             type: 'guilds',
@@ -121,7 +144,7 @@ You can do so [here](https://discord.com/oauth2/authorize?client_id=${client.use
     client.on('guildDelete', () => {
         client.getChannel(client.config.loggingChannel)
             ?.createMessage(`Left a server! Now I have ${client.guilds.size} servers!`)
-            .catch(e => console.error('error logging', e));
+            .catch(e => logger.error('error logging', e));
 
         updateData?.({
             type: 'guilds',
@@ -130,12 +153,12 @@ You can do so [here](https://discord.com/oauth2/authorize?client_id=${client.use
     });
 
     client.on('error', (e) => {
-        console.error(e);
+        logger.error(e);
     });
 
     client.connect().catch(e => {
-        console.error('Error logging into client');
-        console.error(e);
+        logger.error('Error logging into client');
+        logger.error(e);
         process.exit(1);
     });
 
@@ -143,26 +166,26 @@ You can do so [here](https://discord.com/oauth2/authorize?client_id=${client.use
     {
         // Load commands
         let commands = await fs.readdir('./src/commands');
-        console.info(`Loading ${commands.length} command${commands.length !== 1 ? 's' : ''}.`);
+        logger.info(`Loading ${commands.length} command${commands.length !== 1 ? 's' : ''}.`);
         let done = 0;
         await Promise.all(commands.map(async cmd => {
             if (!cmd.endsWith('.js')) return;
             let r = await client.loadCommand(cmd);
             if (!r) done++;
         }));
-        console.log(`Successfully loaded ${done}/${commands.length} command${commands.length !== 1 ? 's' : ''}.`);
+        logger.log(`Successfully loaded ${done}/${commands.length} command${commands.length !== 1 ? 's' : ''}.`);
     }
     {
         // Load slash commands
         let commands = await fs.readdir('./src/slash');
-        console.info(`Loading ${commands.length} slash command${commands.length !== 1 ? 's' : ''}.`);
+        logger.info(`Loading ${commands.length} slash command${commands.length !== 1 ? 's' : ''}.`);
         let done = 0;
         await Promise.all(commands.map(async cmd => {
             if (!cmd.endsWith('.js')) return;
             let r = await client.loadSlashCommand(cmd);
             if (!r) done++;
         }));
-        console.log(`Successfully loaded ${done}/${commands.length} slash command${commands.length !== 1 ? 's' : ''}.`);
+        logger.log(`Successfully loaded ${done}/${commands.length} slash command${commands.length !== 1 ? 's' : ''}.`);
     }
 
     return client;

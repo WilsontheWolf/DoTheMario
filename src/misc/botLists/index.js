@@ -1,3 +1,5 @@
+import { logger } from '../logger.js';
+
 export default async (id) => {
     const tokens = {
         topcord: process.env.TOPCORD,
@@ -18,7 +20,7 @@ export default async (id) => {
         if(typeof func !== 'function') return;
         loaded.push(func);
     });
-    console.log(`Loaded ${loaded.length} bot list stats.`);
+    logger.log(`Loaded ${loaded.length} bot list stats.`);
     return (guilds, shards) => {
         loaded.forEach(func => func({guilds, shards, id}, tokens[func.name]));
     };

@@ -1,3 +1,5 @@
+import { logger } from '../logger.js';
+
 const test = async ({ guilds, shards, id }, token) => {
     const data = {
         guilds,
@@ -5,7 +7,7 @@ const test = async ({ guilds, shards, id }, token) => {
         id,
         token,
     };
-    console.warn('Test Bot List', data);
+    logger.warn('Test Bot List', data);
 
 };
 

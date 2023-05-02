@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{title}}</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
+
+        body {
+            max-width: 50em;
+            margin: 0 auto;
+        }
+
+        code {
+            background-color: rgb(30, 32, 33);
+            color: rgb(255, 65, 103);
+        }
+
+        @media (prefers-color-scheme: light) {
+            code {
+                background-color: rgb(225, 225, 225);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {{content}}
+</body>
+
+</html>

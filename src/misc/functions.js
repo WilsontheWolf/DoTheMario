@@ -1,15 +1,17 @@
+import { logger } from './logger.js';
+
 export default (client) => {
     client.loadCommand = async (cmd) => {
         try {
             let name = cmd.split('.');
             if (name.length !== 1) name.pop();
             name = name.join('.');
-            console.info(`Loading command ${name}...`);
+            logger.info(`Loading command ${name}...`);
             const c = await (await import(`../commands/${cmd}`)).cmd;
             client.commands.set(c.name, c);
         } catch (e) {
-            console.error(`Error loading command ${cmd}:`);
-            console.error(e);
+            logger.error(`Error loading command ${cmd}:`);
+            logger.error(e);
             return e;
         }
     };
@@ -18,12 +20,12 @@ export default (client) => {
             let name = cmd.split('.');
             if (name.length !== 1) name.pop();
             name = name.join('.');
-            console.info(`Loading slash command ${name}...`);
+            logger.info(`Loading slash command ${name}...`);
             const c = await(await import(`../slash/${cmd}`)).cmd;
             client.slashCommands.set(c.name, c);
         } catch (e) {
-            console.error(`Error loading slash command ${cmd}:`);
-            console.error(e);
+            logger.error(`Error loading slash command ${cmd}:`);
+            logger.error(e);
             return e;
         }
     };
@@ -41,7 +43,7 @@ export default (client) => {
                     else if (perms.has('voiceRequestToSpeak'))
                         await channel.guild.editVoiceState({ requestToSpeakTimestamp: new Date().toISOString() });
                 } catch (e) {
-                    console.error('Error attempting to escalate stage channel permissions.\n', e);
+                    logger.error('Error attempting to escalate stage channel permissions.\n', e);
                 }
             }
             connection.play('./song.ogg');
@@ -52,12 +54,12 @@ export default (client) => {
                 try {
                     await channel.leave();
                 } catch (e) {
-                    console.warn('error leaving after doing the song\n', e);
+                    logger.warn('error leaving after doing the song\n', e);
                 }
             });
         } catch (e) {
-            console.error('error doing the song');
-            console.error(e);
+            logger.error('error doing the song');
+            logger.error(e);
         }
     };
     client.canJoinVC = (channel) => {
