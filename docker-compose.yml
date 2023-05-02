@@ -13,6 +13,7 @@ services:
     volumes:
       - ./data:/app/data
       - ./song:/app/song
+      - ${PWD}/config.js:/app/src/config.js
     restart: unless-stopped
     stop_grace_period: 10s
     ports:
