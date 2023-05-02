@@ -37,6 +37,6 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ghcr.io/wilsonthewolf/DoTheMario:latest
+          tags: ghcr.io/wilsonthewolf/dothemario:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
