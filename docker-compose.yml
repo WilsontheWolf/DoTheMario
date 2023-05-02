@@ -12,6 +12,7 @@ services:
       # When blank defaults to start:single
     volumes:
       - ./data:/app/data
+      - ./song:/app/song
     restart: unless-stopped
     stop_grace_period: 10s
     ports:

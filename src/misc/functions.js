@@ -46,7 +46,7 @@ export default (client) => {
                     logger.error('Error attempting to escalate stage channel permissions.\n', e);
                 }
             }
-            connection.play('./song.ogg');
+            connection.play('./song/song.ogg');
             client.updateData?.({
                 type: 'count'
             });

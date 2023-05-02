@@ -66,7 +66,6 @@ class Child extends EventEmitter {
                 break;
             default:
                 found = false;
-                logger.log('Child got message', message);
                 break;
         }
         return found;

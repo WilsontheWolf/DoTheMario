@@ -7,7 +7,7 @@ RUN apk update && \
     apk add \
     make \
     g++ \
-    python3
+    python3 
 
 COPY yarn.lock package.json ./
 
@@ -21,7 +21,8 @@ ENV NODE_ENV="production"
 
 RUN apk update && \
     apk upgrade && \
-    apk add --no-cache dumb-init
+    apk add --no-cache dumb-init \
+    ffmpeg
 
 RUN mkdir /app/data && \
     chown -R node:node /app
