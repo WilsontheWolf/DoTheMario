@@ -29,6 +29,7 @@ RUN mkdir /app/data && \
 
 COPY --chown=node:node --from=builder /app .
 COPY --chown=node:node src/ src/
+COPY --chown=node:node public/ public/
 
 USER node:node
 
