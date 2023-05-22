@@ -48,6 +48,14 @@ const ready = async (client) => {
             tag: `${client.user.username}#${client.user.discriminator}`,
         }
     });
+
+    setInterval(() => {
+        if(!client.ready) return;
+        updateData({
+            type: 'guilds',
+            data: client.guilds.size
+        });
+    }, 1000 * 60 * 5);
 };
 
 const client = await createClient({

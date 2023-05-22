@@ -92,7 +92,7 @@ const createClient = async (options, ready, updateData) => {
         if (!content) return;
 
         const args = content
-            .split(/\s+/g);
+            .split(' ');
         const command = args.shift().toLowerCase();
 
         const cmd = client.commands.get(command);
