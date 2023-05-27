@@ -21,6 +21,7 @@
     "dotenv": "^16.0.3",
     "koa": "^2.14.2",
     "node-fetch": "^3.3.1",
+    "prom-client": "^14.2.0",
     "sodium-native": "4.0.1",
     "topgg-autoposter": "^2.0.1"
   },

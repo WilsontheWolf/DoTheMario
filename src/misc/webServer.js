@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import fs from 'node:fs/promises';
 import { logger } from './logger.js';
+import { register, registerMetrics, shouldSendMetrics, updateDataForMetrics } from './metrics.js';
 
 const app = new Koa();
 const api = new Map();
@@ -131,12 +132,17 @@ api.set('privacy', async (ctx) => {
     return await renderPage(ctx, 'privacy', 'Privacy Policy');
 });
 
+api.set('metrics', async () => {
+    return await register.metrics();
+});
+
 const updateConstants = (constants) => {
     app.context.constants = constants;
-
 };
+
 const updateData = (data) => {
     app.context.data = data;
+    updateDataForMetrics(data);
 };
 
 export default (startingConst = {}, port, getShardData) => {
@@ -145,6 +151,10 @@ export default (startingConst = {}, port, getShardData) => {
     updateData({});
 
     app.context.getShardData = getShardData;
+
+    if(shouldSendMetrics()) {
+        registerMetrics(getShardData);
+    } else api.delete('metrics');
 
     app.use(async (ctx) => {
         let { path, url } = ctx;

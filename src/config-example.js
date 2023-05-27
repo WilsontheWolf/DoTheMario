@@ -21,6 +21,10 @@ const config = {
     uptimeBadge: 'https://status.shorty.systems/api/badge/3/uptime?style=for-the-badge&label=uptime&labelSuffix=',
     // The support server of the bot
     supportServer: 'https://discord.gg/jRN7SZB',
+    // The prefix for prometheus metrics
+    // Leave blank to disable
+    // E.G. 'dtm_'
+    metricsPrefix: '',
 };
 
 export default config;
