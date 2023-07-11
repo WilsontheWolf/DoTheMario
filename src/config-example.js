@@ -1,3 +1,5 @@
+import 'dotenv/config'; 
+
 const config = {
     prefix: '?',
     token: process.env.TOKEN,

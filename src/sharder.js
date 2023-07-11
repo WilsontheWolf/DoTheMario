@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { Client, Collection } from '@projectdysnomia/dysnomia';
 import config from './config.js';
 import { handleToken } from './misc/token.js';

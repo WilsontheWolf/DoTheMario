@@ -2,7 +2,6 @@ import webServer from './misc/webServer.js';
 import botLists from './misc/botLists/index.js';
 import Josh from '@joshdb/core';
 import provider from '@joshdb/sqlite';
-import 'dotenv/config';
 import config from './config.js';
 import createClient from './bot.js';
 import getManager from './misc/CountManager.js';
