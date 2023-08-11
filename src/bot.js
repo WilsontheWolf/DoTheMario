@@ -1,4 +1,4 @@
-import { Client } from '@projectdysnomia/dysnomia';
+import { Client, Constants } from '@projectdysnomia/dysnomia';
 import { handleToken } from './misc/token.js';
 import config from './config.js';
 import fs from 'node:fs/promises';
@@ -31,8 +31,9 @@ const createClient = async (options, ready, updateData) => {
 
     client.once('ready', async () => {
         client.editStatus('online', {
-            name: client.config.name || 'music',
-            type: 2
+            name: client.config.catchPrase || 'Do do do...',
+            state: client.config.catchPrase || 'Do do do...',
+            type: Constants.ActivityTypes.CUSTOM,
         });
         logger.log(`Logged in as ${client.user.username}#${client.user.discriminator}!`);
         logger.log(`I'm in ${client.guilds.size} servers.`);
