@@ -120,6 +120,7 @@ class ChildManager extends EventEmitter {
             case 'guildUpdate': {
                 this.childInformation.guilds = message.count;
                 this.updateData?.({ type: 'guilds', data: message.count });
+                // TODO:
                 break;
             }
 
@@ -133,6 +134,11 @@ class ChildManager extends EventEmitter {
 
             case 'readyInfo': {
                 this.updateData?.({ type: 'constants', data: message.data });
+                break;
+            }
+
+            case 'guildMsg': {
+                this.updateData?.({ type: 'guildMsg', data: message.msg });
                 break;
             }
 
@@ -190,6 +196,16 @@ class ChildManager extends EventEmitter {
         if (type === 'count') {
             this.send('count', {
                 count: data,
+            });
+        }
+        if (type === 'guilds') {
+            this.send('guilds', {
+                count: data,
+            });
+        }
+        if (type === 'guildMsg') {
+            this.send('guildMsg', {
+                msg: data,
             });
         }
     }

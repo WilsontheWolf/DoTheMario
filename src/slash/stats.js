@@ -1,4 +1,5 @@
 import getManager from '../misc/CountManager.js';
+import { guildCount } from '../misc/guildManager.js';
 
 const cmd = {
     name: 'stats',
@@ -11,7 +12,7 @@ cmd.run = async (client, interaction) => {
     await interaction.createMessage({
         content: `**Stats:**
 >>> ${(client.config.countMessage || 'I have been used {{count}} times.').replace('{{count}}', `**${await manager.get()}**`)}
-I am in **${client.guilds.size}** servers.
+I am in **${guildCount}** servers.
 You are talking to shard **#${interaction.channel?.guild?.shard?.id ?? '?'}**`, flags: 64
     });
 };

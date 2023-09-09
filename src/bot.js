@@ -4,6 +4,7 @@ import config from './config.js';
 import fs from 'node:fs/promises';
 import functions from './misc/functions.js';
 import { logger } from './misc/logger.js';
+import { doGuildMsg, updateGuildCount, setClient } from './misc/guildManager.js';
 
 /**
  * @param {import('@projectdysnomia/dysnomia').ClientOptions} options 
@@ -39,8 +40,10 @@ const createClient = async (options, ready, updateData) => {
         logger.log(`I'm in ${client.guilds.size} servers.`);
 
         ready?.(client);
-        
-        if(options.isSharded && !options.isMainChild) return;
+
+        updateGuildCount(client.guilds.size);
+
+        if (options.isSharded && !options.isMainChild) return;
 
         logger.log('Ensuring slash commands');
         let res = await client.slashValidate();
@@ -132,26 +135,24 @@ You can do so [here](https://discord.com/oauth2/authorize?client_id=${client.use
     });
 
     client.on('guildCreate', () => {
-        client.getChannel(client.config.loggingChannel)
-            ?.createMessage(`Joined a new server! Now I have ${client.guilds.size} servers!`)
-            .catch(e => logger.error('error logging', e));
-
         updateData?.({
             type: 'guilds',
             data: client.guilds.size
         });
+        updateGuildCount(client.guilds.size);
+        doGuildMsg('Joined a new server!');
     });
 
     client.on('guildDelete', () => {
-        client.getChannel(client.config.loggingChannel)
-            ?.createMessage(`Left a server! Now I have ${client.guilds.size} servers!`)
-            .catch(e => logger.error('error logging', e));
-
         updateData?.({
             type: 'guilds',
             data: client.guilds.size
         });
+        updateGuildCount(client.guilds.size);
+        doGuildMsg('Left a server!');
     });
+
+    setClient(client);
 
     client.on('error', (e) => {
         logger.error(e);

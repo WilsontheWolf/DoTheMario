@@ -99,6 +99,7 @@ const updateData = async ({ type, data }) => {
     if (type === 'guilds') {
         if (!allReady()) return;
         postBotLists(guildCount(), shards);
+        updateChildren?.('guilds', guildCount());
     }
     else if (type === 'count') {
         await db.inc('count');
@@ -106,6 +107,8 @@ const updateData = async ({ type, data }) => {
     } else if (type === 'constants') {
         constants = { ...constants, ...data };
         server.updateConstants(constants);
+    } else if (type === 'guildMsg') {
+        updateChildren?.('guildMsg', data);
     }
     else logger.warn('Unknown type', type);
     server.updateData({ count: await db.get('count') });
