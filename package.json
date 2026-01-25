@@ -14,18 +14,21 @@
   "license": "MIT",
   "private:": true,
   "dependencies": {
-    "@discordjs/opus": "0.9.0",
+    "@discordjs/opus": "0.10.0",
     "@joshdb/core": "^1.2.7",
     "@joshdb/sqlite": "^1.1.9",
-    "@projectdysnomia/dysnomia": "^0.1.2",
-    "dotenv": "^16.0.3",
+    "@projectdysnomia/dysnomia": "^0.2.3",
+    "dotenv": "^17.2.3",
     "koa": "^2.14.2",
-    "node-fetch": "^3.3.1",
+    "node-fetch": "^3.3.2",
     "prom-client": "^14.2.0",
-    "sodium-native": "4.0.3",
-    "topgg-autoposter": "^2.0.1"
+    "sodium-native": "5.0.10",
+    "topgg-autoposter": "^2.0.2"
   },
   "devDependencies": {
     "eslint": "^8.41.0"
+  },
+  "resolutions": {
+    "better-sqlite3": "^12.6.2"
   }
 }
