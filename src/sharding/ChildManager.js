@@ -67,7 +67,7 @@ class ChildManager extends EventEmitter {
             const timeout = setTimeout(() => {
                 this.child?.kill();
                 reject(new Error('Child took too long to start'));
-            }, 10000);
+            }, 30000);
             this.resolve = () => {
                 clearTimeout(timeout);
                 this.ready = true;
