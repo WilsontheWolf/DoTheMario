@@ -29,6 +29,6 @@
     "eslint": "^8.41.0"
   },
   "resolutions": {
-    "better-sqlite3": "^12.6.2"
+    "better-sqlite3": "^12.11.1"
   }
 }

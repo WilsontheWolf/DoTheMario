@@ -156,16 +156,6 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@projectdysnomia/dysnomia@^0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@projectdysnomia/dysnomia/-/dysnomia-0.2.3.tgz#2d17c19e3ea9f3ff583dce5fbf02b9b0a83d9ef2"
-  integrity sha512-BBF9JV0wEJJXUdO+Kxj+LlKoFfgwj02LCXZOgt0jD+vuh1q9Yw57XNjaFwWXQHurD7PfmwqERC+UINDBlOo9Xw==
-  dependencies:
-    ws "^8.18.0"
-  optionalDependencies:
-    "@stablelib/xchacha20poly1305" "~1.0.1"
-    opusscript "^0.1.1"
-
 "@projectdysnomia/dysnomia@github:projectdysnomia/dysnomia#dev":
   version "0.2.3"
   resolved "https://codeload.github.com/projectdysnomia/dysnomia/tar.gz/ae81d0fe6251e01de8c6e842dfade0f2b90456c3"
@@ -458,10 +448,10 @@ base64-js@^1.3.1:
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
 
-better-sqlite3@^12.6.2, better-sqlite3@^7.1.0:
-  version "12.6.2"
-  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-12.6.2.tgz#770649f28a62e543a360f3dfa1afe4cc944b1937"
-  integrity sha512-8VYKM3MjCa9WcaSAI3hzwhmyHVlH8tiGFwf0RlTsZPWJ1I5MkzjiudCo4KC4DxOaL/53A5B1sI/IbldNFDbsKA==
+better-sqlite3@^12.11.1, better-sqlite3@^7.1.0:
+  version "12.11.1"
+  resolved "https://registry.yarnpkg.com/better-sqlite3/-/better-sqlite3-12.11.1.tgz#067846efabf7671957fc8a9e8df3be39c6cc0b84"
+  integrity sha512-dq9AtApgg5PGFtBzPFSBl3HZQjHok5gaQCM6zh2Yk0aSmDCs1CbnVI8/HgASQkNKsWFpseIO9beg5xxpYhbIfA==
   dependencies:
     bindings "^1.5.0"
     prebuild-install "^7.1.1"

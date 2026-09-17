@@ -1,4 +1,4 @@
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY yarn.lock package.json ./
 
 RUN yarn --production=true --frozen-lockfile --link-duplicates
 
-FROM node:22-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
