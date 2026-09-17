@@ -14,7 +14,7 @@
   "license": "MIT",
   "private:": true,
   "dependencies": {
-    "@discordjs/opus": "0.10.0",
+    "@discordjs/opus": "github:WilsontheWolf/d.js-opus",
     "@joshdb/core": "^1.2.7",
     "@joshdb/sqlite": "^1.1.9",
     "@projectdysnomia/dysnomia": "github:projectdysnomia/dysnomia#dev",
